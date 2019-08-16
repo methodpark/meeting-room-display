@@ -1,0 +1,17 @@
+[Unit]
+Description=Starting Room Display
+After=multi-user.target
+ConditionPathExists={{deploydir}}/mrd/display_main.py
+
+[Service]
+Type=simple
+User=pi
+PIDFile=/var/run/mrd.pid
+ExecStart=/usr/bin/python3 -m mrd.display_main
+WorkingDirectory={{deploydir}}
+Restart=always
+RestartSec=3
+Environment="KIVY_GL_BACKEND=gl"
+
+[Install]
+WantedBy=multi-user.target

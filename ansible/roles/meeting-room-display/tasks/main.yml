@@ -1,0 +1,307 @@
+---
+################## ensure the rootfs has enough space ##################
+- name: Assert root partition has sufficient space
+  assert: { that: item.mount != '/' or item.size_available > 314572800 } # 300 MiB
+  with_items: '{{ ansible_mounts }}'
+  ignore_errors: yes
+  register: sufficient_space
+  tags: installation
+
+- name: Resize rootfs to use the whole SD Card
+  command: /usr/bin/raspi-config --expand-rootfs
+  when: sufficient_space is failed
+  tags: installation
+
+- name: restart machine
+  command: shutdown -r now "Ansible restart triggered"
+  when: sufficient_space is failed
+  async: 0
+  poll: 0
+  ignore_errors: true
+  tags: installation
+
+- name: waiting for server to come back
+  local_action: wait_for host={{ ansible_ssh_host | default(inventory_hostname) }}
+                state=started
+                delay=30
+                timeout=120
+                connect_timeout=15
+  when: sufficient_space is failed
+  become: False     # don't try to become root
+  tags: installation
+
+
+################## Install Kivy ##################
+
+# Following https://kivy.org/docs/installation/installation-rpi.html
+
+# The gstreamer packages may not be found without a dist-upgrade and following update.
+- name: Perform an apt-get dist-upgrade
+  apt:
+    upgrade: dist
+  tags:
+    - installation
+    - upgrade
+
+- name: Run the equivalent of apt-get update
+  apt:
+    update_cache: yes
+  tags:
+    - installation
+    - deployment
+    - upgrade
+
+- name: Install required Debian packages
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+  with_items:
+      # From kivy installation guide:
+      - libsdl2-dev
+      - libsdl2-image-dev
+      - libsdl2-mixer-dev
+      - libsdl2-ttf-dev
+      - pkg-config
+      - libgl1-mesa-dev
+      - libgles2-mesa-dev
+      - python3-setuptools
+      - libgstreamer1.0-dev
+      - git-core
+      - gstreamer1.0-plugins-bad
+      - gstreamer1.0-plugins-base
+      - gstreamer1.0-plugins-good
+      - gstreamer1.0-plugins-ugly
+      - gstreamer1.0-omx
+      - gstreamer1.0-alsa
+      - libmtdev-dev
+      - python3-dev
+      - xclip
+      - xsel
+      # Other packages:
+      - python3-pip       # Without this package, the pip command may refer to the pip3 command
+      - python3-kivy
+      - python3-pydbus
+      - python3-qrcode    # library for making QR codes
+      - mosquitto         # Broker for mqtt clients
+      - python-setuptools # Workaround to make Ansible shut up about missing setuptools
+  tags:
+    - installation
+    - upgrade
+
+- name: Install required PyPi packages
+  pip:
+    executable: pip3
+    name: "{{item}}"
+  with_items:
+      - O365              # Python library for interaction with Office 365
+      - paho-mqtt         # library for mqtt clients
+  tags:
+    - installation
+    - upgrade
+
+- name: Install Cython  # This may take > 20 min
+  pip:
+    executable: pip3
+    name: Cython
+    version: 0.28.2
+    extra_args: -U
+  tags: installation
+
+- name: Install Kivy globally on the system
+  pip:
+    executable: pip3
+    name: git+https://github.com/kivy/kivy.git@master
+  tags: installation
+
+################## Generate locales ##################
+
+- name: Generate locales
+  command: "{{item}}"
+  with_items:
+    - sed -i 's/^# \(de_DE\.UTF-8 UTF-8\)$/\1/' /etc/locale.gen
+    - locale-gen
+  tags:
+    - installation
+    - upgrade
+
+################## Get the code ##################
+
+- name: Clone meeting room display git repository
+  git:
+    repo: "{{repo}}"
+    refspec: "{{refspec}}"
+    dest: "{{deploydir}}"
+    accept_hostkey: yes
+    force: yes
+  tags:
+    - installation
+    - deployment
+    - hotspot
+  become: false  # Files should be owned by user pi, not root
+
+
+- name: Install the Raspberry Pi library for the WS2812 LEDs
+  command: "bash {{deploydir}}/ansible/install_ws2812.sh {{deploydir}}"
+  tags: installation
+
+- name: enable ntp (update date and time as soon as network connection is established)
+  command: sudo timedatectl set-ntp True
+  tags: installation
+
+- name: Install and configure hotspot mode
+  command: "bash {{deploydir}}/hotspot/setup.sh {{deploydir}} --install"
+  tags:
+    - installation
+    - hotspot
+
+- name: Update hotspot mode (html files and start script)
+  command: "bash {{deploydir}}/hotspot/setup.sh {{deploydir}} --update"
+  tags: deployment
+
+################## Add cron entries ##################
+
+- cron:
+    name: "shutdown every friday"
+    minute: "0"
+    hour: "18"
+    weekday: "5"
+    job: "/usr/bin/python3 /home/pi/mrd-repo/scripts/shutdown.py"
+  tags: installation
+
+- cron:
+    name: "sleep every evening"
+    minute: "0"
+    hour: "18"
+    job: "/usr/bin/python3 /home/pi/mrd-repo/scripts/sleep.py"
+  tags: installation
+
+- cron:
+    name: "wake every morning"
+    minute: "0"
+    hour: "6"
+    job: "/usr/bin/python3 /home/pi/mrd-repo/scripts/wakeup.py"
+  tags: installation
+
+- cron:
+    name: "refresh oauth2 token once a day"
+    minute: "0"
+    hour: "6"
+    job: "/usr/bin/python3 /home/pi/mrd-repo/scripts/refresh_token.py"
+  tags: installation
+
+################## Set up autostart ##################
+
+- name: Copy D-Bus policy file
+  template: src=dbus-1/system.d/mrd.conf dest=/etc/dbus-1/system.d/mrd.conf mode=u+r
+  tags:
+    - installation
+    - upgrade
+
+- name: Copy systemd Unit
+  template: src=backlight.service dest=/etc/systemd/system/backlight.service mode=u+r
+  tags:
+    - installation
+    - upgrade
+
+- name: Set up Backlight Service autostarting
+  service: name=backlight enabled=yes
+  tags: installation
+
+- name: Restart Backlight Service daemon
+  service: name=backlight state=restarted
+  register: restart
+
+- name: Start Backlight observer daemon
+  service: name=backlight_status state=started
+  when: restart.skipped is defined
+  tags: installation
+
+- name: Copy systemd Unit
+  template: src=mrd.service dest=/etc/systemd/system/mrd.service mode=u+r
+  tags: installation
+
+- name: Set up Display Main autostarting
+  service: name=mrd enabled=yes
+  tags: installation
+
+- name: Restart Display Main daemon
+  service: name=mrd state=restarted
+  register: restart
+
+- name: Start Backlight observer daemon
+  service: name=backlight_status state=started
+  when: restart.skipped is defined
+  tags: installation
+
+- name: Copy systemd Unit
+  template: src=backlight_status.service dest=/etc/systemd/system/backlight_status.service mode=u+r
+  tags: installation
+
+- name: Set up observer for Backlight Service
+  service: name=backlight_status enabled=yes
+  tags: installation
+
+- name: Restart Backlight Service observer daemon
+  service: name=backlight_status state=restarted
+  register: restart
+
+- name: Start Backlight observer daemon
+  service: name=backlight_status state=started
+  when: restart.skipped is defined
+  tags: installation
+
+- name: Copy systemd Unit
+  template: src=backlight_status.timer dest=/etc/systemd/system/backlight_status.timer mode=u+r
+  tags: installation
+
+- name: Set up timer for Backlight Service
+  service: name=backlight_status.timer enabled=yes
+  tags: installation
+
+- name: Restart Backlight Service timer daemon
+  service: name=backlight_status.timer state=restarted
+  register: restart
+
+- name: Start Backlight observer daemon
+  service: name=backlight_status state=started
+  when: restart.skipped is defined
+  tags: installation
+
+- name: Copy systemd Unit
+  template: src=pishutdown.service dest=/etc/systemd/system/pishutdown.service mode=u+r
+  tags: installation
+
+- name: Set up Pi Shutdown autostarting
+  service: name=pishutdown enabled=yes
+  tags: installation
+
+- name: Restart Pi Shutdown daemon
+  service: name=pishutdown state=restarted
+  register: restart
+
+- name: Start Backlight observer daemon
+  service: name=backlight_status state=started
+  when: restart.skipped is defined
+  tags: installation
+
+
+# Make sure there is a default kivy configuration and the corresponding folder so that the configuration
+# file can be replaced in the next step (there is no default kivy configuration directly after installation).
+# We need only the side effect of the command below.
+- name: Create default kivy config if no config is present
+  command: python3 -c "import kivy"
+  tags:
+    - installation
+    - deployment
+  become: false
+
+# Replace default kivy configuration by customized one (with touch display enabled)
+- name: Copy custom kivy configuration file
+  copy:
+    src: "{{deploydir}}/kivy/config.ini"
+    remote_src: yes  # We mean the src path on the *remote/target* machine
+    dest: /home/pi/.kivy/config.ini
+  tags:
+    - installation
+    - deployment
+  become: false

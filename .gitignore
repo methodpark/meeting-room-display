@@ -1,0 +1,9 @@
+**/__pycache__
+*.pyc
+.project
+.pydevproject
+/.idea
+workspace.xml
+mrd/ui/img/hostname_qr.png
+mrd/configuration.ini
+mrd/o365_token.txt

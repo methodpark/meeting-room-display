@@ -1,0 +1,6 @@
+---
+# Variables for meeting room display deployment
+
+deploydir: /home/pi/mrd-repo
+repo: ssh://[add repo adress]
+refspec: master

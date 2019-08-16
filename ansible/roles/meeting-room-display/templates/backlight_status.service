@@ -1,0 +1,9 @@
+[Unit]
+Description=Check Backlight Status
+
+[Service]
+Type=simple
+ExecStart={{deploydir}}/scripts/backlight_status.sh
+
+[Install]
+WantedBy=multi-user.target

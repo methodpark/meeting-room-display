@@ -1,0 +1,15 @@
+[Unit]
+Description=Starting D-Bus Backlight Service
+After=multi-user.target
+ConditionPathExists={{deploydir}}/mrd/backlight/dbus_service.py
+
+[Service]
+Type=simple
+PIDFile=/var/run/backlight.pid
+ExecStart=/usr/bin/python3 -m mrd.backlight.dbus_service
+WorkingDirectory={{deploydir}}
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

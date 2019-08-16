@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: MRD 1.0\n"
+"Report-Msgid-Bugs-To: <thilo.kratzer@methodpark.de>\n"
+"POT-Creation-Date: 2018-11-05 12:08+0100\n"
+"Last-Translator: Christoph Erhardt <christoph.erhardt@methodpark.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: mrd/ui.py
+msgid "available"
+msgstr "frei"
+
+msgid "no events today"
+msgstr "keine Veranstaltungen heute"
+
+msgid "all-day"
+msgstr "ganztags"
+
+msgid "until"
+msgstr "bis"
+
+msgid "%a, %Y/%m/%d"
+msgstr "%a, %d.%m.%Y"
+
+msgid "occupied"
+msgstr "belegt"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "no connection to wifi"
+msgstr "Keine Verbindung zum Wifi"
+
+msgid "pending ..."
+msgstr "Bitte warten ..."
+
+msgid "Incorrect username or password,\nplease update configuration file!"
+msgstr "Nutzername oder Passwort falsch,\nbitte Konfiguration aktualisieren!"
+
+msgid "Not able to start hotspot mode,\n    please contact supervisor!"
+msgstr "Hotspot konnte nicht gestartet werden,\n         bitte Supervisor informieren!"
+
+msgid "Welcome to MP Meeting Room Display!"
+msgstr "Willkommen zum MP Meeting Room Display!"
+
+msgid "To configure your device connect to:"
+msgstr "Verbinden Sie sich zum Konfigurieren Ihres Gerätes mit:"
+
+msgid "and open"
+msgstr "Öffnen Sie anschließend"
+
+msgid "Book room:"
+msgstr "Raum buchen:"
+
+msgid "confirm"
+msgstr "buchen"
+
+msgid "cancel"
+msgstr "abbrechen"
+
+msgid "Terminate:"
+msgstr "Beenden:"
+
+msgid "Set password for canceling:"
+msgstr "Passwort zum Beenden festlegen:"
+
+msgid "Insert determined password:"
+msgstr "Zum Beenden Passwort eingeben:"

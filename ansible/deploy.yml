@@ -1,0 +1,7 @@
+---
+
+- name: Deploy meeting-room-display
+  hosts: all
+  become: true
+  roles:
+    - meeting-room-display

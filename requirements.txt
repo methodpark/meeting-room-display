@@ -1,0 +1,5 @@
+O365
+docutils
+pygments
+pypiwin32; sys_platform == 'win32'
+paho-mqtt

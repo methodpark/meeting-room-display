@@ -1,0 +1,17 @@
+[Unit]
+Description=Starting PI Shutdown Service
+After=multi-user.target
+ConditionPathExists={{deploydir}}/scripts/pi-shutdown.py
+
+[Service]
+ExecStart=/usr/bin/python3 pi-shutdown.py
+WorkingDirectory={{deploydir}}/scripts
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=pishutdown
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

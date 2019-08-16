@@ -1,0 +1,48 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+printMAC()
+{
+        interface="eth0"
+        if [ $# -ge 0 ]; then
+                interface=$1
+        fi
+
+        FILE="/sys/class/net/${interface}/address"
+        mac="00:00:00:00:00"
+
+        if [ -f $FILE ]; then
+                mac=$(cat ${FILE})
+        fi
+
+        printf "My ${interface} MAC address is %s\n" "${mac}"
+}
+
+# Print hostname
+printf "My hostname is %s\n" $(hostname)
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s" "$_IP"
+  if ( grep "^static ip_address=" "/etc/dhcpcd.conf" ); then
+    printf " (static)"
+  fi
+  printf "\n"
+fi
+
+# Print the MAC addresses
+printMAC "eth0"
+printMAC "wlan0"
+
+exit 0
