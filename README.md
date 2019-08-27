@@ -2,6 +2,8 @@
 
 MedDev team workshop 2018: A display system for showing meeting room reservations. A raspberry pi (raspi) with a touch display is used.
 
+![Screenshot](screenshot.png)
+
 ## Continuous integration
 
 There are several tags that can be specified for updating the devices. See the list below for
