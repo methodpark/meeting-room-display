@@ -57,16 +57,6 @@ detailed description of executed actions:
 
     * Optional: Set correct timezone (4 Localisation options -> I2 Change Timezone)
 
-* Establish passwordless SSH access for the raspi on the GitLab
-
-    * Create authentication keys for the user root on the raspi (as the Ansible deployment runs as root as well)
-        * Run a root shell by typing
-          sudo -i
-        * Generate authentication keys by typing
-          ssh-keygen -t rsa -b 4096
-
-    * Add the public key to the GitLab project's list of deploy keys by copy and pasting the contents of the newly generated file /root/.ssh/id_rsa.pub to corresponding place in the GitLab project's settings (Settings -> Deploy keys).
-
 ## Setting up the project for development on Linux (Ubuntu)
 
 * Install kivy as described in https://kivy.org/docs/installation/installation-linux.html
