@@ -1,7 +1,8 @@
 ---
 
 - name: Deploy meeting-room-display
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   roles:
     - meeting-room-display
