@@ -77,9 +77,10 @@
       - python3-dev
       - xclip
       - xsel
+      - libjpeg-dev
       # Other packages:
       - python3-pip       # Without this package, the pip command may refer to the pip3 command
-      - python3-kivy
+      #- python3-kivy
       - python3-pydbus
       - python3-qrcode    # library for making QR codes
       - mosquitto         # Broker for mqtt clients
@@ -95,6 +96,7 @@
   with_items:
       - O365              # Python library for interaction with Office 365
       - paho-mqtt         # library for mqtt clients
+      - setuptools
   tags:
     - installation
     - upgrade
@@ -103,14 +105,14 @@
   pip:
     executable: pip3
     name: Cython
-    version: 0.28.2
+    version: 0.29.10
     extra_args: -U
   tags: installation
 
 - name: Install Kivy globally on the system
   pip:
     executable: pip3
-    name: git+https://github.com/kivy/kivy.git@master
+    name: kivy
   tags: installation
 
 ################## Generate locales ##################
@@ -151,7 +153,7 @@
 - name: Install and configure hotspot mode
   command: "bash {{deploydir}}/hotspot/setup.sh {{deploydir}} --install"
   tags:
-    - installation
+    #- installation
     - hotspot
 
 - name: Update hotspot mode (html files and start script)
