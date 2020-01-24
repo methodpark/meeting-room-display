@@ -2,5 +2,5 @@
 # Variables for meeting room display deployment
 
 deploydir: /home/pi/mrd-repo
-repo: https://github.com/methodpark/meeting-room-display.git
+repo: https://github.com/cmd-k/meeting-room-display.git
 refspec: master
