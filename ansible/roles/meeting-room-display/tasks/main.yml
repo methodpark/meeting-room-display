@@ -94,18 +94,26 @@
     executable: pip3
     name: "{{item}}"
   with_items:
-      - O365              # Python library for interaction with Office 365
+#      - O365              # Python library for interaction with Office 365
       - paho-mqtt         # library for mqtt clients
       - setuptools
   tags:
     - installation
     - upgrade
-
-- name: Install Cython  # This may take > 20 min
+    
+- name: Install O365 #Special version to get check_token_file to work 
   pip:
     executable: pip3
     name: Cython
     version: 0.29.10
+    extra_args: -U
+  tags: installation
+
+- name: Install Cython  # This may take > 20 min
+  pip:
+    executable: pip3
+    name: O365
+    version: 1.1.3
     extra_args: -U
   tags: installation
 
