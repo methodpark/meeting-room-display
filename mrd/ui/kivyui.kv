@@ -172,6 +172,8 @@
 <MainScreen>:
     name: 'main_screen'
 
+    #:import utils kivy.utils
+
     clock_label: clock_label
     date_label: date_label
     room_free_label: room_free_label
@@ -186,6 +188,7 @@
     no_connection_image: no_connection_image
     flames_image_left: flames_image_left
     flames_image_right: flames_image_right
+    logo_image: logo_image
 
     FloatLayout:
         id: main_layout
@@ -198,7 +201,7 @@
         BoxLayout:
             canvas:
                 Color:
-                    rgba: 0,0,0,1
+                    rgba: utils.get_color_from_hex('#11161f')
             padding: 10,10,10,10
             BoxLayout:
                 orientation: 'vertical'
@@ -218,15 +221,7 @@
                         valign: "top"
                         halign: "left"
                         text_size: self.size
-
-                    Label:
-                        id: capacity_label
-                        size_hint_x: 0.14
-                        text: ""
-                        font_size: 35
-                        valign: "top"
-                        halign: "right"
-                        text_size: self.size
+                        color: utils.get_color_from_hex('#002d72')
 
                     Label:
                         size_hint_x: 0.06
@@ -242,11 +237,14 @@
                             id: clock_label
                             font_size: 70
                             size_hint_y: 0.15
+                            color: utils.get_color_from_hex('#002d72')
 
                         Label:
                             id: date_label
                             font_size: 30
                             size_hint_y: 0.15
+                            color: utils.get_color_from_hex('#002d72')
+
 
                     StackLayout:
                         Label:
@@ -256,6 +254,7 @@
                             id: room_free_label
                             font_size: 70
                             size_hint_y: 0.15
+                            color: utils.get_color_from_hex('#f1b434')
 
                         Label:
                             size_hint_y: 0.1
@@ -264,29 +263,49 @@
                             id: appointment_name_label
                             font_size: 25
                             size_hint_y: 0.1
+                            color: utils.get_color_from_hex('#002d72')
 
                         Label:
                             id: appointment_time_label
                             font_size: 25
                             size_hint_y: 0.1
+                            color: utils.get_color_from_hex('#002d72')
 
                         Label:
                             id: upcoming_appointment_label
                             font_size: 25
                             size_hint_y: 0.1
+                            color: utils.get_color_from_hex('#002d72')
+
+        Label:
+            id: capacity_label
+            size_hint_x: 0.14
+            text: ""
+            font_size: 35
+            pos: root.width - 135, 10
+            text_size: self.size
+            color: utils.get_color_from_hex('#002d72')
+
+        Image:
+            id: logo_image
+            source: 'mrd/ui/img/kuc-logo.png'
+            size_hint: None, None
+            size: 340, 190
+            pos: root.width - 360, root.height - 145
+            opacity: 0
         Image:
             id: touch_image
             source: 'mrd/ui/img/touch.png'
             size_hint: None, None
             size: 40, 40
-            pos: root.width - 200, root.height - 60
+            pos: 15, 15
             opacity: 0
         Image:
             id: capacity_image
             source: 'mrd/ui/img/capacity.png'
             size_hint: None, None
             size: 40, 40
-            pos: root.width - 60, root.height - 60
+            pos: root.width - 55, 15
             opacity: 0
         Image:
             id: no_connection_image
