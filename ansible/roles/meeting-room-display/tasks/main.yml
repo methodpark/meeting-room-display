@@ -101,7 +101,7 @@
     - installation
     - upgrade
     
-- name: Install O365 #Special version to get check_token_file to work 
+- name: Install Cython  # This may take > 20 min 
   pip:
     executable: pip3
     name: Cython
@@ -109,7 +109,7 @@
     extra_args: -U
   tags: installation
 
-- name: Install Cython  # This may take > 20 min
+- name: Install O365 #Special version to get check_token_file to work
   pip:
     executable: pip3
     name: O365
