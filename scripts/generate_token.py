@@ -19,7 +19,7 @@ import json
 
 from configparser import ConfigParser
 from mrd.time_util import convert_secs_since_epoch_to_string
-from O365 import Connection
+from O365 import Account
 from pathlib import Path
 
 BASEDIR = Path(__file__).parents[1]
@@ -50,19 +50,23 @@ MAIL_ID = items['id']
 
 print("Generate token for id", CLIENT_ID, "with secret", CLIENT_SECRET)
 
-scopes = ['offline_access', 'https://graph.microsoft.com/Calendars.ReadWrite']
+scopes = ['offline_access', 'Calendars.ReadWrite']
 path = BASEDIR / "mrd/o365_token.txt"
 
-con = Connection(credentials=(CLIENT_ID, CLIENT_SECRET), scopes=scopes, token_file_name=path)
+credentials = (CLIENT_ID, CLIENT_SECRET)
+account = Account(credentials)
+if account.authenticate(scopes=scopes):
+    print('Authenticated')
+#con = Connection(credentials=(CLIENT_ID, CLIENT_SECRET), scopes=scopes, token_file_name=path)
 
-if not con.check_token_file():
-    print("No valid token found. Starting authentication process for <%s> ..." % MAIL_ID)
-    if gen_token_file(con):
-        print("Successfully stored token file at", path.absolute())
-    else:
-        print("Failed to store token file")
-else:
-    token = json.load(path.absolute().open())
-    print("Valid token found at", path.absolute())
-    print("access_token=", token['access_token'])
-    print("expires_at=", convert_secs_since_epoch_to_string(token['expires_at']))
+# if not con.check_token_file():
+#     print("No valid token found. Starting authentication process for <%s> ..." % MAIL_ID)
+#     if gen_token_file(con):
+#         print("Successfully stored token file at", path.absolute())
+#     else:
+#         print("Failed to store token file")
+# else:
+#     token = json.load(path.absolute().open())
+#     print("Valid token found at", path.absolute())
+#     print("access_token=", token['access_token'])
+#     print("expires_at=", convert_secs_since_epoch_to_string(token['expires_at']))
