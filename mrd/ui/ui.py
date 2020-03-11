@@ -288,12 +288,12 @@ class MainScreen(Screen):
             title = ""
             self._manager.set_free_until()
         else:
-            date_until = _("until") + " " + time.strftime("%H:%M", time.localtime(occupation.upcoming_event_today.date_from))
+            date_until = _("until") + " " + time.strftime("%H:%M", time.localtime(occupation.upcoming_event_today.date_from)) + " Uhr"
             title = occupation.upcoming_event_today.title
             date_diff = int(occupation.upcoming_event_today.date_from - time.time())
             self._manager.set_free_until(date_diff - datetime.minutes(1))  # leave one minute as buffer
             if date_diff <= 15 * 60:
-                self.set_frame_color(1, 0.4, 0)
+                self.set_frame_color(1, 1, 0)
 
         self.appointment_time_label.text = date_until
         self.upcoming_appointment_label.text = title
