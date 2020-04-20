@@ -19,18 +19,10 @@ import json
 
 from configparser import ConfigParser
 from mrd.time_util import convert_secs_since_epoch_to_string
-from O365 import Connection
+from O365 import Account, FileSystemTokenBackend
 from pathlib import Path
 
 BASEDIR = Path(__file__).parents[1]
-
-
-def gen_token_file(con):
-    print("Please visit the following url and paste the result url into the command line!")
-    url = con.get_authorization_url()
-    print(url)
-    result_url = input("Paste the result url here: ")
-    return con.request_token(result_url, store_token=True)
 
 
 path = BASEDIR / 'mrd/configuration.ini'
@@ -50,14 +42,17 @@ MAIL_ID = items['id']
 
 print("Generate token for id", CLIENT_ID, "with secret", CLIENT_SECRET)
 
-scopes = ['offline_access', 'https://graph.microsoft.com/Calendars.ReadWrite']
-path = BASEDIR / "mrd/o365_token.txt"
+scopes = ['offline_access', 'https://graph.microsoft.com/Calendars.ReadWrite.Shared']
+token_path = BASEDIR / "mrd"
+token_filename = "o365_token.txt"
+path = token_path / token_filename
+token_backend = FileSystemTokenBackend(token_path=token_path, token_filename=token_filename)
 
-con = Connection(credentials=(CLIENT_ID, CLIENT_SECRET), scopes=scopes, token_file_name=path)
+account = Account((CLIENT_ID, CLIENT_SECRET), token_backend=token_backend)
 
-if not con.check_token_file():
+if not account.is_authenticated:
     print("No valid token found. Starting authentication process for <%s> ..." % MAIL_ID)
-    if gen_token_file(con):
+    if account.authenticate(redirect_uri='https://login.microsoftonline.com/common/oauth2/nativeclient', scopes=scopes):
         print("Successfully stored token file at", path.absolute())
     else:
         print("Failed to store token file")

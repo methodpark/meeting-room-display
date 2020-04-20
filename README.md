@@ -73,12 +73,12 @@ detailed description of executed actions:
 
 * O365 Authentification Flow
 
-    * To work with oauth you first need to register your application "Meeting_Room_Display" at [Microsoft Application Registration Portal](https://apps.dev.microsoft.com/).
+    * To work with oauth you first need to register your application "Meeting_Room_Display" at [Microsoft Azure](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade).
 
-        1. Login at [Microsoft Application Registration Portal](https://apps.dev.microsoft.com/)
+        1. Login at [Microsoft Azure](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
         2. Create an app, note your app id (client_id) in the "mrd/configuration.ini"
         3. Generate a new password (client_secret) under "Application Secrets" section
-        4. Under the "Platform" section, add a new Web platform and set "https://outlook.office365.com/owa/" as the redirect URL
+        4. Under the "Platform" section, add a new Web platform and set "https://login.microsoftonline.com/common/oauth2/nativeclient" as the redirect URL
         5. Under "Microsoft Graph Permissions" section, add the delegated permissions you want (see scopes), as an example, to read and write calendar use:
             1. Calendar.Read
             2. Calendar.ReadWrite
@@ -90,7 +90,7 @@ detailed description of executed actions:
             python3 -m scripts.generate_token
             ```
             
-        2. The user must visit the given url and give consent to the application. When consent is given, the page will redirect to: "https://outlook.office365.com/owa/".
+        2. The user must visit the given url and give consent to the application. When consent is given, the page will redirect to: "https://login.microsoftonline.com/common/oauth2/nativeclient".
     
             Then the user must copy the resulting page url and give it to the connection object (copy the url to command line interface):
             This, if succesful, will store the token in a txt file on the project folder "mrd/o365_token.txt".
