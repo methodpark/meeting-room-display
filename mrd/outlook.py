@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License along with
 # Meeting-Room Display.  If not, see <https://www.gnu.org/licenses/>.
 
-import calendar
 import datetime
 import logging
 import pathlib
@@ -64,15 +63,15 @@ class OutlookRoomRepository(rooms.RoomRepositoryPort):
         self._credentials = (client_id, client_secret)
         self.calendar = None
 
-        global Account, Event
+        global Account, FileSystemTokenBackend
 
         if use_mock:
             logging.warning("mock behavior not implemented yet, using O365 library anyway")
             # from mrd.mocks.event_mock import AccountMock as Account
             # from mrd.mocks.event_mock import EventMock as Event
-            from O365 import Account, Event
+            from O365 import Account, FileSystemTokenBackend
         else:
-            from O365 import Account, Event
+            from O365 import Account, FileSystemTokenBackend
 
     def fetch_calendar(self):
         if self.calendar is not None:
@@ -164,8 +163,11 @@ class OutlookRoomRepository(rooms.RoomRepositoryPort):
             logging.info("OutlookRoomRepository: cancelled event {0}, {1}, {2}".format(event.subject, event.start, event.end))
 
     def _get_calendar(self, name=None):
-        filename = pathlib.Path() / 'mrd/o365_token.txt'
-        account = Account(credentials=self._credentials, scopes=self._scopes, token_file_name=filename)
+        token_path = pathlib.Path() / 'mrd'
+        token_filename = 'o365_token.txt'
+        token_backend = FileSystemTokenBackend(token_path=token_path, token_filename=token_filename)
+
+        account = Account(credentials=self._credentials, scopes=self._scopes, token_backend=token_backend)
         schedule = account.schedule()
         if name is not None:
             return schedule.get_calendar(calendar_name=name)
@@ -177,4 +179,4 @@ class OutlookRoomRepository(rooms.RoomRepositoryPort):
             return False
         else:
             return event.organizer.address.lower() == self._room_id.lower() \
-                   and event.subject == self._ad_hoc_subject
+                and event.subject == self._ad_hoc_subject
