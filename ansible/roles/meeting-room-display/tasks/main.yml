@@ -79,7 +79,6 @@
       - xsel
       # Other packages:
       - python3-pip       # Without this package, the pip command may refer to the pip3 command
-      - python3-kivy
       - python3-pydbus
       - python3-qrcode    # library for making QR codes
       - mosquitto         # Broker for mqtt clients
@@ -95,23 +94,10 @@
   with_items:
       - O365              # Python library for interaction with Office 365
       - paho-mqtt         # library for mqtt clients
+      - kivy
   tags:
     - installation
     - upgrade
-
-- name: Install Cython  # This may take > 20 min
-  pip:
-    executable: pip3
-    name: Cython
-    version: 0.28.2
-    extra_args: -U
-  tags: installation
-
-- name: Install Kivy globally on the system
-  pip:
-    executable: pip3
-    name: git+https://github.com/kivy/kivy.git@master
-  tags: installation
 
 ################## Generate locales ##################
 
