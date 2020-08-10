@@ -270,6 +270,18 @@
   when: restart.skipped is defined
   tags: installation
 
+- name: Copy systemd Unit
+  template: src=discoveryServer.service dest=/etc/systemd/system/discoveryServer.service mode=u+r
+  tags: installation
+
+- name: Set up Discovery Server autostarting
+  service: name=discoveryServer enabled=yes
+  tags: installation
+
+- name: Restart Discovery Server daemon
+  service: name=discoveryServer state=restarted
+  register: restart
+
 
 # Make sure there is a default kivy configuration and the corresponding folder so that the configuration
 # file can be replaced in the next step (there is no default kivy configuration directly after installation).
