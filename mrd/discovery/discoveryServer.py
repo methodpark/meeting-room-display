@@ -3,7 +3,7 @@
 import logging
 
 # setup logging
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG, filename='./udpServer.log')
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 import socket
 import threading
 from socketserver import UDPServer, BaseRequestHandler
