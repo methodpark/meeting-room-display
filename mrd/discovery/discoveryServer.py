@@ -50,8 +50,6 @@ class Handler(BaseRequestHandler):
 if __name__ == "__main__":
     import os
 
-    print(os.getcwd())
-
     # start server
     logging.info("Starting new server.")
     udp_server = MasterUDPServer()
