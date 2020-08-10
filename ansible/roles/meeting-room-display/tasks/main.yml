@@ -110,6 +110,32 @@
     - installation
     - upgrade
 
+################## Add configUser account for mrd-cockpit ##################
+
+- name: Add group for mrd-cockpit
+  group:
+    name: config
+  tags:
+    - installation
+    - upgrade
+
+- name: Add user for mrd-cockpit
+  user:
+    name: configUser
+    groups: config
+  tags:
+    - installation
+    - upgrade
+
+- name: Allow users in the config group to reboot the device
+  copy:
+    content: "%config ALL=NOPASSWD: /sbin/reboot\n"
+    dest: /etc/sudoers.d/010_config-nopasswd
+    mode: 0440
+  tags:
+    - installation
+    - upgrade
+
 ################## Get the code ##################
 
 - name: Clone meeting room display git repository
@@ -125,6 +151,27 @@
     - hotspot
   become: false  # Files should be owned by user pi, not root
 
+- name: Adjust directory permissions in the working copy
+  file:
+    path: "{{deploydir}}/mrd"
+    group: config
+    mode: g+w
+  tags:
+    - installation
+    - deployment
+    - hotspot
+    - upgrade
+
+- name: Adjust configuration-file permissions in the working copy
+  file:
+    path: "{{deploydir}}/mrd/configuration.ini"
+    group: config
+    mode: g+w
+  tags:
+    - installation
+    - deployment
+    - hotspot
+    - upgrade
 
 - name: Install the Raspberry Pi library for the WS2812 LEDs
   command: "bash {{deploydir}}/ansible/install_ws2812.sh {{deploydir}}"
