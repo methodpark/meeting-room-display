@@ -11,20 +11,6 @@ from socketserver import UDPServer, BaseRequestHandler
 PORT = 55555  # randomly picked port, has to be the same in client program
 
 
-# ensuring we get the correct ip address on all operating systems
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
-        ip = s.getsockname()[0]
-    except:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
-
-
 class MasterUDPServer(threading.Thread):
     def run(self):
         addr = ("", PORT)  # empty string corresponds to INADDR_ANY and means receiving from any host
@@ -42,8 +28,7 @@ class Handler(BaseRequestHandler):
         logging.info("The request is: {}".format(request))
         if request == str.encode("MRD"):  # is it our UDP client?
             socket = self.request[1]
-            ip = get_ip()
-            reply = "MRD %s %s" % (Handler.my_addr, ip)  # respond with hostname and IP
+            reply = "MRD {}".format(Handler.my_addr)  # respond with hostname
             socket.sendto(str.encode(reply), self.client_address)
 
 
