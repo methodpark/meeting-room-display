@@ -127,9 +127,9 @@
     - installation
     - upgrade
 
-- name: Allow users in the config group to reboot the device
+- name: Allow users in the config group to reboot the device and restart the MRD service
   copy:
-    content: "%config ALL=NOPASSWD: /sbin/reboot\n"
+    content: "%config ALL=NOPASSWD: /sbin/reboot\n%config ALL=NOPASSWD: /bin/systemctl restart mrd.service\n"
     dest: /etc/sudoers.d/010_config-nopasswd
     mode: 0440
   tags:
